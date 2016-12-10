@@ -7,6 +7,7 @@
 		body{
 			width: 600px;
 			margin: 0 auto;
+			padding-top: 10px;
 		}
 		canvas#cav{
 			border: 1px solid;
@@ -14,20 +15,20 @@
 	</style>
 </head>
 <body>
-<canvas id="cav" width="600" height="800">Your browser doens not support canvas!</canvas>
+<canvas id="cav" width="600" height="640">Your browser doens not support canvas!</canvas>
 <script type="text/javascript">
 	var canvas=document.getElementById('cav'),
 		 ctx=canvas.getContext('2d'),
 		 width=canvas.width, height=canvas.height,
-		 x = 0, y= 0, 
-		 blockWidth = 20, blockHeight = 20, 
-		 dir=5,
+		 x = 0, y= 0, w=20,h=20,
+		 blockWidth = 20, blockHeight = 20, objWidth = 0,
+		 dir=5, go = true,
 		 baseRow = 0, baseColumn = width/blockWidth/2, 
 		 rowCount=0, columnCount=0,
 		 grid=[], objGrid=[];
 
 	function DisplayGrid(){
-		var initX = 0, initY=0;
+		
 		for(var r=0; r<width/blockWidth; r++){
 			grid[r] = [];
 			for(var c=0; c<height/blockHeight; c++){
@@ -35,7 +36,8 @@
 			}
 		}		
 		this.draw=function(){		
-		ctx.strokeStyle = "#AAA";			
+			var initX = 0, initY=0;
+			ctx.strokeStyle = "#AAA";			
 			while(initX<width){				
 				initX = initX+blockWidth;				
 				ctx.beginPath();		
@@ -57,38 +59,49 @@
 
 	function Brick(rows, cols, status){
 		var bricks = [];
-		var initR = baseRow, initC = baseColumn;		
-		for(var r=0; r<rows; r++){	
-			bricks[r] = [];
-			initC = baseColumn;
-			for(var c=0; c<cols; c++){
-				bricks[r][c] = {x:initC*blockWidth, y:r*blockHeight, status:status[r][c], girdX:r, gridY: baseColumn+c};
-				initC++;
-			}
-			initR++;
+		var initR = baseRow, initC = baseColumn;	
+		this.init = function(){
+			for(var r=0; r<rows; r++){	
+				bricks[r] = [];
+				initC = baseColumn;
+				for(var c=0; c<cols; c++){
+					bricks[r][c] = {x:initC*blockWidth, y:r*blockHeight, status:status[r][c], girdX:r, gridY: baseColumn+c};
+					initC++;
+				}
+				initR++;
+			}			
 		}
-		console.log(bricks);
 				
-		this.draw = function(){			
+		this.draw = function(){		
+			objWidth = cols*blockWidth;			
 			for(var r in bricks){
 				for(var c in bricks[r]){
 					if(bricks[r][c].status != 0){
 						ctx.beginPath();
-						ctx.moveTo(bricks[r][c].x,bricks[r][c].y);
+						ctx.moveTo(bricks[r][c].x+x,bricks[r][c].y+y);
 						ctx.fillStyle = "#ff0000";
-						ctx.fillRect(bricks[r][c].x,bricks[r][c].y,blockWidth,blockHeight);
+						ctx.fillRect(bricks[r][c].x+x,bricks[r][c].y+y,blockWidth,blockHeight);
 						ctx.strokeStyle = "#555555"								;
-						ctx.strokeRect(bricks[r][c].x,bricks[r][c].y,blockWidth,blockHeight);
-					}
+						ctx.strokeRect(bricks[r][c].x+x,bricks[r][c].y+y,blockWidth,blockHeight);
+					}					
 				}
 			}			
 		}
 
 		this.logic = function(){
-			var floorOfTheObject = bricks.reduce(function(prev, current){
+			var floorOfTheObject = bricks.reduce(function(prev, current){				
 				return(prev.gridX>current.gridX)? prev:current;
 			})
-			console.log(floorOfTheObject);
+			
+			floorOfTheObject.forEach(function(position){					
+				if(position.status != 0 && position.y+y+blockHeight < height){
+					y = y + dir;			
+					if(position.y + blockHeight > height){
+						go = false;
+					}		
+				}
+			})
+
 		}
 	}
 
@@ -137,16 +150,19 @@
 
 	// var balls=[new Ball(),new Ball(),new Ball()];
 	var disp = new DisplayGrid();
-	disp.draw();
-	var obj = [new LBrick()];
+	var obj = [new ZBrick()];
 
-	// setInterval(function(){
-	// 	ctx.clearRect(0,0,width,height);		
-		obj.forEach(function(item){
-			item.logic();
-			item.draw();
-		});
-	// },30);
+	setInterval(function(){
+		if(go){
+			ctx.clearRect(0,0,width,height);					
+			disp.draw();
+			obj.forEach(function(item){
+				item.init();
+				item.logic();
+				item.draw();
+			});
+		}		
+	},30);
 	document.onkeydown = move;
 	
 
