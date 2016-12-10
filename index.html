@@ -69,8 +69,7 @@
 					initC++;
 				}
 				initR++;
-			}			
-			console.log(bricks)
+			}						
 		}
 				
 		this.draw = function(){					
@@ -79,8 +78,7 @@
 				x -= 20;
 			}		
 			for(var r in bricks){
-				for(var c in bricks[r]){
-					console.log(bricks[r][c].status)
+				for(var c in bricks[r]){					
 					if(bricks[r][c].status != 0){
 						ctx.beginPath();
 						ctx.moveTo(bricks[r][c].x+x,bricks[r][c].y+y);
@@ -103,12 +101,13 @@
 				if(position.status != 0 && position.y+y+blockHeight < height && goDown){
 					y = y + blockHeight;			
 					goDown = false;
-					if(position.y + blockHeight > height){
-						go = false;
-					}	
-
 				}
+				if(position.y+y+blockHeight >= height){
+					go = false;
+				}
+
 			})
+
 
 		}
 
@@ -183,26 +182,37 @@
 		return new Brick(rowCount, columnCount, statusObj);	
 	}
 
+	var registeredBrickList = [ABrick, TBrick, LBrick, IBrick, CBrick, RBrick, ZBrick];
+
+	function getNextBricks(){
+		console.log("get next brick");
+		nextIndex = parseInt(Math.random()*10);
+		while(nextIndex > registeredBrickList.length-1){
+			nextIndex = parseInt(Math.random()*10);
+		}		
+		return new registeredBrickList[nextIndex]();
+	}
 
 
-
-	// var ball1=new Ball();
-	// var ball2=new Ball();
-	// var ball3=new Ball();
-
-	// var balls=[new Ball(),new Ball(),new Ball()];
+	
 	var disp = new DisplayGrid();
-	var obj = [new ABrick()];
+	var item = getNextBricks()
+	// var obj = [new ABrick()];
 
-	setInterval(function(){
+	setInterval(function(){		
 		if(go){
 			ctx.clearRect(0,0,width,height);					
 			disp.draw();
-			obj.forEach(function(item){
+			// obj.forEach(function(item){
 				item.init();
 				item.logic();
 				item.draw();
-			});
+			// });
+		}else{
+			item = getNextBricks();
+			go = true;
+			y=0;
+			x=0;
 		}		
 	},500);
 	document.onkeydown = move;

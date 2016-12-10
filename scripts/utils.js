@@ -11,12 +11,12 @@ function move(e){
 	if(e.keyCode == '37' && startX>0){		
 		x = x-20
 	}
-	if(e.keyCode == '40' && y+h < height-50){
+	if(e.keyCode == '40' && y+(2*blockHeight) < height-40){
 	console.log("called")		
-		y = y+(2*blockHeight);
+		y = y+(2*blockHeight);		
 	}
 	if(e.keyCode == '38' && y+h < height-50){						
-		obj[0].orientation();		
+		item.orientation();		
 	}
 
 }
