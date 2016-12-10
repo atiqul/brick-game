@@ -169,6 +169,20 @@
 		return new Brick(rowCount, columnCount, statusObj);
 	}
 
+	function CBrick(){
+		rowCount = 2;
+		columnCount = 3;
+		var statusObj = [[1,1,1],[1,0,1]];
+		return new Brick(rowCount, columnCount, statusObj);
+	}
+
+	function ABrick(){
+		rowCount = 2;
+		columnCount = 2;
+		var statusObj = [[1,1],[0,1]];
+		return new Brick(rowCount, columnCount, statusObj);	
+	}
+
 
 
 
@@ -178,7 +192,7 @@
 
 	// var balls=[new Ball(),new Ball(),new Ball()];
 	var disp = new DisplayGrid();
-	var obj = [new LBrick()];
+	var obj = [new ABrick()];
 
 	setInterval(function(){
 		if(go){
