@@ -22,7 +22,7 @@
 		 width=canvas.width, height=canvas.height,
 		 x = 0, y= 0, w=20,h=20,
 		 blockWidth = 20, blockHeight = 20, objWidth = 0,
-		 dir=5, go = true,
+		 dir=20, go = true,
 		 baseRow = 0, baseColumn = width/blockWidth/2, 
 		 rowCount=0, columnCount=0,
 		 grid=[], objGrid=[];
@@ -70,12 +70,17 @@
 				}
 				initR++;
 			}			
+			console.log(bricks)
 		}
 				
-		this.draw = function(){		
-			objWidth = cols*blockWidth;			
+		this.draw = function(){					
+			objWidth = cols*blockWidth;	
+			if(x+(baseColumn*20)+objWidth > width){
+				x -= 20;
+			}		
 			for(var r in bricks){
 				for(var c in bricks[r]){
+					console.log(bricks[r][c].status)
 					if(bricks[r][c].status != 0){
 						ctx.beginPath();
 						ctx.moveTo(bricks[r][c].x+x,bricks[r][c].y+y);
@@ -85,23 +90,46 @@
 						ctx.strokeRect(bricks[r][c].x+x,bricks[r][c].y+y,blockWidth,blockHeight);
 					}					
 				}
-			}			
+			}						
 		}
 
 		this.logic = function(){
 			var floorOfTheObject = bricks.reduce(function(prev, current){				
 				return(prev.gridX>current.gridX)? prev:current;
 			})
-			
+			var goDown = true;			
+
 			floorOfTheObject.forEach(function(position){					
-				if(position.status != 0 && position.y+y+blockHeight < height){
-					y = y + dir;			
+				if(position.status != 0 && position.y+y+blockHeight < height && goDown){
+					y = y + blockHeight;			
+					goDown = false;
 					if(position.y + blockHeight > height){
 						go = false;
-					}		
+					}	
+
 				}
 			})
 
+		}
+
+		this.orientation = function(){			
+			var tempStatusObj = [];
+			for(var i = 0; i < cols; i++){
+				tempStatusObj[i] = [];
+				for(var j = 0; j < rows; j++){
+					tempStatusObj[i][j] = status[rows-(j+1)][i]; 
+				}				
+			}			
+			var tempCols = cols;
+			cols = rows;
+			rows = tempCols;			
+			status = tempStatusObj;	
+			bricks = [];					
+		}
+
+		this.print = function(){
+			console.log("row : " + rows);
+			console.log("cols : " + cols);			
 		}
 	}
 
@@ -150,7 +178,7 @@
 
 	// var balls=[new Ball(),new Ball(),new Ball()];
 	var disp = new DisplayGrid();
-	var obj = [new ZBrick()];
+	var obj = [new LBrick()];
 
 	setInterval(function(){
 		if(go){
@@ -162,7 +190,7 @@
 				item.draw();
 			});
 		}		
-	},30);
+	},500);
 	document.onkeydown = move;
 	
 
